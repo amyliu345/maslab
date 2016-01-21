@@ -1,0 +1,13 @@
+## constants.py
+
+# Motors
+
+RIGHT_DRIVE_CONTROLLER_DIRECTION    = 
+RIGHT_DRIVE_CONTROLLER_PWM          = 
+
+LEFT_DRIVE_CONTROLLER_DIRECTION     = 
+LEFT_DRIVE_CONTROLLER_PWM           = 
+
+# IR Sensor
+
+SHORT_DISTANCE_IR    = 
