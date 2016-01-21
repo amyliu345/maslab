@@ -8,16 +8,10 @@ from constants import *
 class Robot(SyncedSketch):
 
     def setup(self):
-
-        # Motor object representing the left motor.
-        self.leftMotor = Motor(self.tamp, LEFT_DRIVE_CONTROLLER_DIRECTION, LEFT_DRIVE_CONTROLLER_PWM)
-        # Motor object representing the right motor.
-        self.rightMotor = Motor(self.tamp, RIGHT_DRIVE_CONTROLLER_DIRECTION, RIGHT_DRIVE_CONTROLLER_PWM)
-
+    #TODO
 
     def loop(self):
     #TODO
-        assert not self.follow.checkForInitializationErrors()
 
 # main code:
 if __name__ == "__main__":
