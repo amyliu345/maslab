@@ -15,6 +15,8 @@ class Robot(SyncedSketch):
 
     TURN_STATE = 2
 
+    OTHER_REVERSE_STATE = 3
+
     def setup(self):
         self.state = self.STRAIGHT_STATE
 
@@ -25,11 +27,13 @@ class Robot(SyncedSketch):
 
     
 
-        self.bumper_1 = DigitalInput(self.tamp, BUMP_SENSOR_1)
+        self.bumper_RF = DigitalInput(self.tamp, BUMP_SENSOR_R_FRONT)
 
-        self.bumper_2 = DigitalInput(self.tamp, BUMP_SENSOR_2)
+        self.bumper_LF = DigitalInput(self.tamp, BUMP_SENSOR_L_FRONT)
 
-       # self.bumper_3 = DigitalInput(self.tamp, BUMP_SENSOR_3)
+        self.bumper_RS = DigitalInput(self.tamp, BUMP_SENSOR_R_SIDE)
+
+        self.bumper_LS = DigitalInput(self.tamp, BUMP_SENSOR_L_SIDE)
 
 
         self.comp_timer = Timer()
@@ -39,6 +43,8 @@ class Robot(SyncedSketch):
         self.reverse_timer = Timer()
 
         self.turn_timer = Timer()
+
+        self.bump_timer = Timer()
 
 
         self.turn_direction = 1
@@ -61,34 +67,59 @@ class Robot(SyncedSketch):
                 #print 'STR'
                 self.goStraight(0, 100)
  
-                if self.bumper_1.val == 0: #change so does diff things for diff bumpers
+                if self.bumper_RF.val == 0: #change so does diff things for diff bumpers
                     #print 'BMPED'
                    # print self.bumper_1.val, self.bumper_2.val
                     self.turn_direction = 1
-                    self.turn_pwm = 30
-                    self.state = self.REVERSE_STATE
-                    self.reverse_timer.reset()
-                if self.bumper_2.val == 0:
-                   # print self.bumper_1.val, self.bumper_2.val
-                    self.turn_direction = 1
-                    self.turn_pwm = 75
+                    self.turn_pwm = 60
                     self.state = self.REVERSE_STATE
                     self.reverse_timer.reset()
 
-                if self.straight_timer.millis() > 10000:
+                if self.bumper_LF.val == 0:
+                   # print self.bumper_1.val, self.bumper_2.val
+                    self.turn_direction = 0
+                    self.turn_pwm = 90
                     self.state = self.REVERSE_STATE
                     self.reverse_timer.reset()
+
+                if self.bumper_RS.val == 0:
+                   # print self.bumper_1.val, self.bumper_2.val
+                    self.turn_direction = 1
+                    self.turn_pwm = 40
+                    self.state = self.OTHER_REVERSE_STATE
+                    self.reverse_timer.reset() 
+
+                if self.bumper_LS.val == 0:
+                   # print self.bumper_1.val, self.bumper_2.val
+                    self.turn_direction = 0
+                    self.turn_pwm = 40
+                    self.state = self.OTHER_REVERSE_STATE
+                    self.reverse_timer.reset()
+
+                if self.straight_timer.millis() > 6000:
+                    self.state = self.REVERSE_STATE
+                    self.reverse_timer.reset()
+
 
             elif self.state == self.REVERSE_STATE:
                # print 'REV'
                 self.goStraight(1, 50)
-                if self.reverse_timer.millis() > 1000:
+                if self.reverse_timer.millis() > 800:
                     self.state = self.TURN_STATE
                     self.turn_timer.reset()
+
+            elif self.state == self.OTHER_REVERSE_STATE:
+               # print 'REV'
+                self.goStraight(1, 50)
+                if self.reverse_timer.millis() > 300:
+                    self.state = self.TURN_STATE
+                    self.turn_timer.reset()
+
+
             elif self.state == self.TURN_STATE:
                 #print 'TURM'
                 self.turn(self.turn_direction, self.turn_pwm)
-                if self.turn_timer.millis() > 1000:
+                if self.turn_timer.millis() > 600:
                     self.state = self.STRAIGHT_STATE
                     self.straight_timer.reset()
 
