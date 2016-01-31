@@ -47,7 +47,7 @@ class Robot(SyncedSketch):
         self.bump_timer = Timer()
 
 
-        self.turn_direction = 1
+        self.turn_direction = LEFT
         self.turn_pwm = 50
 
     def goStraight(self, direction, pwm):
@@ -60,64 +60,74 @@ class Robot(SyncedSketch):
 
 
     def loop(self):
-        if self.comp_timer.millis() > 500:
-            #print self.bumper_1.val, self.bumper_2.val
+        if self.comp_timer.millis() < 2000:
+            self.goStraight(0, 100)
+
+        if self.comp_timer.millis() > 2000:
 
             if self.state == self.STRAIGHT_STATE:
-                #print 'STR'
                 self.goStraight(0, 100)
  
-                if self.bumper_RF.val == 0: #change so does diff things for diff bumpers
-                    #print 'BMPED'
-                   # print self.bumper_1.val, self.bumper_2.val
-                    self.turn_direction = 1
+                if self.bumper_RF.val == 0: 
+                    self.turn_direction = LEFT
                     self.turn_pwm = 60
+                    if self.comp_timer.millis() > 90000:
+                        self.turn_pwm = 75
+                    if self.comp_timer.millis() > 105000:
+                        self.turn_pwm = 90
                     self.state = self.REVERSE_STATE
                     self.reverse_timer.reset()
 
                 if self.bumper_LF.val == 0:
-                   # print self.bumper_1.val, self.bumper_2.val
-                    self.turn_direction = 0
+                    self.turn_direction = RIGHT
                     self.turn_pwm = 90
+                    if self.comp_timer.millis() > 90000:
+                        self.turn_pwm = 50
+                    if self.comp_timer.millis() > 105000:
+                        self.turn_pwm = 60
                     self.state = self.REVERSE_STATE
                     self.reverse_timer.reset()
 
                 if self.bumper_RS.val == 0:
-                   # print self.bumper_1.val, self.bumper_2.val
-                    self.turn_direction = 1
+                    self.turn_direction = LEFT
                     self.turn_pwm = 40
                     self.state = self.OTHER_REVERSE_STATE
                     self.reverse_timer.reset() 
 
                 if self.bumper_LS.val == 0:
-                   # print self.bumper_1.val, self.bumper_2.val
-                    self.turn_direction = 0
+                    self.turn_direction = RIGHT
                     self.turn_pwm = 40
+                    if self.comp_timer.millis() > 90000:
+                        self.turn_direction = 0
+                        self.turn_pwm = 50
                     self.state = self.OTHER_REVERSE_STATE
                     self.reverse_timer.reset()
 
-                if self.straight_timer.millis() > 6000:
+                if self.straight_timer.millis() > 7000:
+                    if self.comp_timer.millis() % 2 == 0:
+                        self.turn_direction = RIGHT
+                        self.turn_pwn = 40
+                    else:
+                        self.turn_direction = LEFT
+                        self.turn_pwm = 40
                     self.state = self.REVERSE_STATE
                     self.reverse_timer.reset()
 
 
             elif self.state == self.REVERSE_STATE:
-               # print 'REV'
                 self.goStraight(1, 50)
                 if self.reverse_timer.millis() > 800:
                     self.state = self.TURN_STATE
                     self.turn_timer.reset()
 
             elif self.state == self.OTHER_REVERSE_STATE:
-               # print 'REV'
                 self.goStraight(1, 50)
-                if self.reverse_timer.millis() > 300:
+                if self.reverse_timer.millis() > 500:
                     self.state = self.TURN_STATE
                     self.turn_timer.reset()
 
 
             elif self.state == self.TURN_STATE:
-                #print 'TURM'
                 self.turn(self.turn_direction, self.turn_pwm)
                 if self.turn_timer.millis() > 600:
                     self.state = self.STRAIGHT_STATE
